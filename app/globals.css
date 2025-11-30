@@ -1,1 +1,23 @@
 @import "tailwindcss";
+
+
+
+/* Animación personalizada*/
+@keyframes spin-move {
+  0% {
+    transform: rotate(0deg) translateX(0px);
+  }
+  100% {
+    transform: rotate(360deg) translateX(50px);
+  }
+}
+
+.animate-spin-move {
+  animation: spin-move 0.8s ease-in-out forwards;
+}
+
+/*formulario de inicio*/
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

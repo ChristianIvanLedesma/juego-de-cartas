@@ -7,17 +7,28 @@ interface PropsPokemones {
   pokemones: Pokemones[];
   jugador1: string;
   jugador2: string;
+  nivel: string;
 }
 
-export default function Card({ pokemones, jugador1, jugador2 }: PropsPokemones) {
+export default function Card({ pokemones, jugador1, jugador2,nivel }: PropsPokemones) {
+
+  let cantidad = 5;
+
+  if (nivel === "medio") cantidad = 12;
+  if (nivel === "dificil") cantidad = 18;
+
+  const cartasNivel = pokemones.slice(0, cantidad);
+
   // mezcla cartas
   const mezclarCartas = () => {
-    const duplicadas = [...pokemones, ...pokemones].map((carta, index) => ({
-      ...carta,
-      uniqueId: index,
-    }));
-    return duplicadas.sort(() => Math.random() - 0.5);
-  };
+  const duplicadas = [...cartasNivel, ...cartasNivel,].map((carta, index) => ({
+    ...carta,
+    uniqueId: index,
+  }));
+
+  return duplicadas.sort(() => Math.random() - 0.5);
+};
+
 
   const [cartas, setCartas] = useState(mezclarCartas());
   const [seleccionadas, setSeleccionadas] = useState<number[]>([]);
@@ -81,7 +92,7 @@ export default function Card({ pokemones, jugador1, jugador2 }: PropsPokemones) 
     setSeleccionadas((prev) => [...prev, index]);
   };
 
-  const paresTotales = pokemones.length;
+  const paresTotales = cartasNivel.length;
   const juegoTerminado = acertadas.length === paresTotales;
 
   //en construccion
@@ -94,40 +105,81 @@ export default function Card({ pokemones, jugador1, jugador2 }: PropsPokemones) 
 
   return (
     <>
-      {/* Panel de jugadores */}
-      <div className="flex justify-between items-center top-4 left-8 text-center my-6 gap-4 p-2">
-        <div className="flex justify-center gap-8 text-lg font-semibold ml-4">
-          <p className={turno === 1 ? "text-white scale-110 border rounded-bl-sm rounded-tr-sm bg-green-300 px-4 py-2" : "opacity-70" }
-          >
-            {jugador1}: {puntos1} pts
-          </p>
+     {/* Panel de jugadores mejorado */}
+    <div className="flex justify-between items-center w-full max-w-4xl mx-auto my-6 px-4">
 
-          <p className={turno === 2 ? "text-blue-500 scale-110 border rounded-bl-sm rounded-tr-sm bg-blue-300 px-4 py-2" : "opacity-70"}
-          >
-            {jugador2}: {puntos2} pts
-          </p>
+      <div
+        className={`flex flex-col items-center w-40 p-4 rounded-xl border 
+        backdrop-blur-md shadow-lg transition-all duration-300
+        ${turno === 1 ? "bg-green-400/30 scale-105 border-green-300" : "bg-white/10 opacity-70"}`}
+      >
+        <h3 className="text-lg font-bold text-white">{jugador1}</h3>
+        <p className="text-4xl font-extrabold text-white drop-shadow-md">{puntos1}</p>
 
-           <p className="mt-2 text-sm text-gray-400">
-          Turno de: <span className="font-bold">{turno === 1 ? jugador1 : jugador2}</span>
-          </p>
-        </div>
+        {turno === 1 && (
+          <span className="mt-2 text-xs font-semibold bg-green-500 text-white px-3 py-1 rounded-full animate-pulse">
+            Jugando
+          </span>
+        )}
+      </div>
 
-        <div className=" text-lg font-semibold mr-4">
-          <button
-            onClick={reiniciar}
-            className="text-white bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded cursor-pointer"
-          >
-            Reiniciar Juego
-          </button>
-        </div>
-    </div>
-
-      {/* en construccion ya que aplicare un modal !!!!!!*/}
-      {juegoTerminado && (
-        <p className="text-center font-bold text-3xl mb-4 text-green-400">
-          {mensajeGanador}
+      <div className="text-center">
+        <p className="text-gray-300 text-sm">Turno actual:</p>
+        <p className="text-2xl font-bold text-white mt-1">
+          {turno === 1 ? jugador1 : jugador2}
         </p>
-      )}
+      </div>
+
+  
+        <div
+          className={`flex flex-col items-center w-40 p-4 rounded-xl border 
+          backdrop-blur-md shadow-lg transition-all duration-300
+          ${turno === 2 ? "bg-blue-400/30 scale-105 border-blue-300" : "bg-white/10 opacity-70"}`}
+        >
+          <h3 className="text-lg font-bold text-white">{jugador2}</h3>
+          <p className="text-4xl font-extrabold text-white drop-shadow-md">{puntos2}</p>
+
+          {turno === 2 && (
+            <span className="mt-2 text-xs font-semibold bg-blue-500 text-white px-3 py-1 rounded-full animate-pulse">
+              Jugando
+            </span>
+          )}
+        </div>
+
+        {/* Botón reinicio */}
+        <button
+          onClick={reiniciar}
+          className="ml-6 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl shadow-lg font-semibold transition-all"
+        >
+          Reiniciar
+        </button>
+        <p>{nivel}</p>
+      </div>
+
+
+        {/* Modal ganador */}
+        {juegoTerminado && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-center z-50">
+            <div className="bg-white/20 border border-white/30 backdrop-blur-xl shadow-2xl rounded-xl p-8 w-[350px] text-center animate-[fadeIn_0.3s_ease]">
+
+              <h2 className="text-3xl font-extrabold text-white drop-shadow mb-4">
+                🎉 ¡Ganador!
+              </h2>
+
+              <p className="text-xl text-green-300 font-bold mb-6">
+                {mensajeGanador}
+              </p>
+
+              <button
+                onClick={reiniciar}
+                className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold shadow-lg transition-all"
+              >
+                Jugar de nuevo
+              </button>
+            </div>
+          </div>
+        )}
+
 
       {/* Cartas */}
       <ul className="w-[480px] sm:w-[680px] md:w-[990px] grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 m-auto gap-4 p-5">
